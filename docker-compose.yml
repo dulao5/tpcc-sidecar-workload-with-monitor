@@ -1,0 +1,35 @@
+version: "3"
+
+services:
+  phpapp:
+    build: .
+    networks:
+      nginx_network:
+        aliases:
+          - phpapp
+        ipv4_address: 10.10.10.10
+
+  nginx:
+    build: ./docker-nginx-amplify
+    ports:
+      - 80:80
+    volumes:
+      - ./config/nginx/conf.d:/etc/nginx/conf.d
+      - ./src/public:/var/www/html/public:ro
+    depends_on:
+      - phpapp
+    networks:
+      nginx_network:
+        aliases:
+          - nginx
+        ipv4_address: 10.10.10.20
+    environment:
+      - AMPLIFY_IMAGENAME=game-player-docker-nginx
+      - API_KEY=hoge
+
+networks:
+  nginx_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.10.10.0/24
