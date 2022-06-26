@@ -1,31 +1,84 @@
 version: "3"
-
 services:
   phpapp:
+    #platform: linux/amd64
     build: .
     networks:
       nginx_network:
         aliases:
           - phpapp
         ipv4_address: 10.10.10.10
-
+    environment:
+      - DB_HOST=docker.for.mac.host.internal
+      - DB_PORT=4000
+      - DB_USER=smallworkload
+      - DB_PASS=hogeTODO
+      - DB_NAME=test
   nginx:
-    build: ./docker-nginx-amplify
+    #platform: linux/amd64
+    image: nginx:latest
     ports:
       - 80:80
     volumes:
       - ./config/nginx/conf.d:/etc/nginx/conf.d
       - ./src/public:/var/www/html/public:ro
+      - gatlingdata:/var/www/html/gatling
+    links:
+      - dd-agent:dd-agent
+      - gatling
     depends_on:
+      - dd-agent
       - phpapp
+    labels:
+      com.datadoghq.ad.check_names: '["nginx"]'
+      com.datadoghq.ad.init_configs: '[{}]'
+      com.datadoghq.ad.instances: '[{"nginx_status_url": "http://%%host%%:81/nginx_status"}]'
+      com.datadoghq.ad.logs: '[{"source": "nginx", "service": "web"}]'
     networks:
       nginx_network:
         aliases:
           - nginx
         ipv4_address: 10.10.10.20
+
+  gatling:
+    #platform: linux/amd64
+    build: ./gatling
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./gatling/scenario/:/workdir/gatling-charts-highcharts-bundle-3.3.1/user-files/simulations
+      - gatlingdata:/workdir/gatling-charts-highcharts-bundle-3.3.1/results
+    command: /bin/bash
+    networks:
+      nginx_network:
+        aliases:
+          - nginx
+        ipv4_address: 10.10.10.90
+
+  dd-agent:
+    container_name: dd-agent
+    image: datadog/agent:7
     environment:
-      - AMPLIFY_IMAGENAME=game-player-docker-nginx
-      - API_KEY=hoge
+      - DD_API_KEY=ここに自分のAPIキーを書く
+      - DD_APM_ENABLED=true
+      - DD_LOGS_ENABLED=true
+      - DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL=true
+      - DD_AC_EXCLUDE="name:dd-agent"
+    volumes:
+     - /var/run/docker.sock:/var/run/docker.sock
+     - /proc/:/host/proc/:ro
+     - /sys/fs/cgroup:/host/sys/fs/cgroup:ro
+    ports:
+      - "8126:8126/tcp"
+    networks:
+      nginx_network:
+        aliases:
+          - nginx
+        ipv4_address: 10.10.10.99
+
+volumes:
+  gatlingdata:
+#    external: true
 
 networks:
   nginx_network:
