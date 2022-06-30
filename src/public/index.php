@@ -16,22 +16,11 @@ try {
     // set up error handling
     $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    // get max id from the table warehouse
-    $stmt = $db->prepare("SELECT MAX(w_id) FROM warehouse");
-    $stmt->execute();
-    $maxWarehouseId = $stmt->fetchColumn();
+    $maxWarehouseId = 5000;
+    $maxDistrictId = 10;
+    $maxCustomerId = 3000;
     $randomWarehouseId = rand(1, $maxWarehouseId);
-
-    // get max id from the table district
-    $stmt = $db->prepare("SELECT MAX(d_id) FROM district");
-    $stmt->execute();
-    $maxDistrictId = $stmt->fetchColumn();
     $randomDistrictId = rand(1, $maxDistrictId);
-
-    // get max id from the table customer
-    $stmt = $db->prepare("SELECT MAX(c_id) FROM customer");
-    $stmt->execute();
-    $maxCustomerId = $stmt->fetchColumn();
     $randomCustomerId = rand(1, $maxCustomerId);
 
     // sleep 500ms to simulate a slow connection
@@ -54,5 +43,6 @@ try {
     $db = null;
 } catch (PDOException $e) {
     header("HTTP/1.1 500 Internal Server Error");
+    error_log("error: ". $e->getMessage());
     echo "Error: " . $e->getMessage();
 }
