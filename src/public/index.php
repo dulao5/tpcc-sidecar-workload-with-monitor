@@ -11,10 +11,10 @@ $dbName = getenv("DB_NAME") ?: "test";
 try {
 
     // connect to mysql database (port 4000) using PDO
-    $db = new PDO("mysql:host=$dbHost;dbname=$dbName;port=$dbPort", $dbUser, $dbPass);
-
-    // set up error handling
-    $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $db = new PDO("mysql:host=$dbHost;dbname=$dbName;port=$dbPort", $dbUser, $dbPass, array(
+        PDO::ATTR_TIMEOUT => 5,
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+    ));
 
     $maxWarehouseId = 5000;
     $maxDistrictId = 10;
