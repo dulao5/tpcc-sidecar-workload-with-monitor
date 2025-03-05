@@ -8,3 +8,4 @@ RUN set -x \
     && docker-php-ext-install pdo_mysql
 
 COPY ./src .
+COPY php-fpm.d/www.conf /usr/local/etc/php-fpm.d/www.conf

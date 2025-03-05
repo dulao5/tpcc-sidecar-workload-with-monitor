@@ -16,7 +16,7 @@ try {
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
     ));
 
-    $maxWarehouseId = 5000;
+    $maxWarehouseId = 2;
     $maxDistrictId = 10;
     $maxCustomerId = 3000;
     $randomWarehouseId = rand(1, $maxWarehouseId);
@@ -24,7 +24,7 @@ try {
     $randomCustomerId = rand(1, $maxCustomerId);
 
     // sleep 500ms to simulate a slow connection
-    usleep(500000);
+    usleep(125000);
 
     // create a query to get all the data from the table
     $stmt = $db->query("SELECT * FROM customer where c_w_id = $maxWarehouseId and  c_d_id = $randomDistrictId and c_id = $randomCustomerId");
