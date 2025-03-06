@@ -31,6 +31,9 @@ DefaultLimitNOFILE=1048576
 # restart  systemd-logind：
 systemctl restart systemd-logind
 
+```
+optional : DNS cache for systemd-resolved
+```
 # DNS cache for systemd-resolved
 
 sudo systemctl enable systemd-resolved
@@ -44,6 +47,13 @@ DNSStubListener=yes
 
 sudo systemctl restart systemd-resolved
 
+# append dns to docker-compose.yml
+version: '3.7'
+services:
+  app:
+    image: your_image
+    dns:
+      - 127.0.0.53
 ```
 - Workload
 ```
@@ -74,7 +84,7 @@ index d76fe77..279d734 100644
      image: datadog/agent:7
      environment:
 -      - DD_API_KEY=ここに自分のAPIキーを書く
-+      - DD_API_KEY=706fff9a5405849502d07dfb9b977c9e
++      - DD_API_KEY=***
        - DD_AGENT_MAJOR_VERSION=7
 +      - DD_SITE=datadoghq.com
        - DD_APM_ENABLED=true
