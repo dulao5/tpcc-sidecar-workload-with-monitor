@@ -23,8 +23,10 @@ try {
     $randomDistrictId = rand(1, $maxDistrictId);
     $randomCustomerId = rand(1, $maxCustomerId);
 
+    $stmt = $db->query("begin");
+
     // sleep 500ms to simulate a slow connection
-    usleep(125000);
+    usleep(60000);
 
     // create a query to get all the data from the table
     $stmt = $db->query("SELECT * FROM customer where c_w_id = $maxWarehouseId and  c_d_id = $randomDistrictId and c_id = $randomCustomerId");
@@ -38,6 +40,8 @@ try {
         ),
         "data" => $datas
     ));
+
+    $stmt = $db->query("commit");
 
     // close the connection
     $db = null;

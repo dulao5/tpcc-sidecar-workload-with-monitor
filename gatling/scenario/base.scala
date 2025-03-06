@@ -7,7 +7,7 @@ import io.gatling.http.Predef._
 
 class BasicSimulation extends Simulation {
 
-  val maxClients = 30
+  val maxClients = 150
   val httpProtocol = http
     .baseUrl("http://nginx")
     .acceptHeader("text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")

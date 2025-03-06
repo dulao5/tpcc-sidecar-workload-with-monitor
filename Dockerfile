@@ -1,8 +1,9 @@
-FROM php:7.4-fpm-alpine
+FROM php:8.3.17-fpm-alpine
 
 ENV WORKDIR=/var/www/html
 WORKDIR $WORKDIR
 
+RUN docker-php-ext-enable opcache
 RUN set -x \
     && apk add --no-cache zlib-dev \
     && docker-php-ext-install pdo_mysql

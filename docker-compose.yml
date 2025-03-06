@@ -9,11 +9,17 @@ services:
           - phpapp
         ipv4_address: 10.10.10.10
     environment:
-      - DB_HOST=docker.for.mac.host.internal
+      - DB_HOST=tidbhost
       - DB_PORT=4000
-      - DB_USER=smallworkload
-      - DB_PASS=hogeTODO
+      - DB_USER=root
+      - DB_PASS=pass
       - DB_NAME=test
+    sysctls:
+      - net.ipv4.ip_local_port_range=1024 65535
+      - net.ipv4.tcp_tw_reuse=1
+      - net.ipv4.tcp_fin_timeout=10
+    volumes:
+    - ./custom-php.ini:/usr/local/etc/php/conf.d/custom-php.ini
   nginx:
     #platform: linux/amd64
     image: nginx:latest
@@ -39,6 +45,10 @@ services:
         aliases:
           - nginx
         ipv4_address: 10.10.10.20
+    sysctls:
+      - net.ipv4.ip_local_port_range=1024 65535
+      - net.ipv4.tcp_tw_reuse=1
+      - net.ipv4.tcp_fin_timeout=10
 
   gatling:
     #platform: linux/amd64
@@ -54,13 +64,18 @@ services:
         aliases:
           - nginx
         ipv4_address: 10.10.10.90
+    sysctls:
+      - net.ipv4.ip_local_port_range=1024 65535
+      - net.ipv4.tcp_tw_reuse=1
+      - net.ipv4.tcp_fin_timeout=10
 
   dd-agent:
     container_name: dd-agent
     image: datadog/agent:7
     environment:
-      - DD_API_KEY=ここに自分のAPIキーを書く
+      - DD_API_KEY=hoge
       - DD_AGENT_MAJOR_VERSION=7
+      - DD_SITE=datadoghq.com
       - DD_APM_ENABLED=true
       - DD_LOGS_ENABLED=true
       - DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL=true
