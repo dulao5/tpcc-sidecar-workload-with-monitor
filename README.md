@@ -1,3 +1,7 @@
+## Scenario
+
+`gatling` --> `nginx` --> `php` --short-conn--> `MySQL|TiDB`
+
 
 ## Prepare
 - Tidb cloud
