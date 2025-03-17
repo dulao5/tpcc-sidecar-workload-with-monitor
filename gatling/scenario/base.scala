@@ -5,7 +5,7 @@ import scala.concurrent.duration._
 import io.gatling.core.Predef._
 import io.gatling.http.Predef._
 
-class BasicSimulation extends Simulation {
+class TpccSidecarSimulation extends Simulation {
 
   val maxClients = 300
   val httpProtocol = http
@@ -18,16 +18,20 @@ class BasicSimulation extends Simulation {
     .maxConnectionsPerHost(maxClients)
     .shareConnections
 
-  val scn = scenario("BasicSimulation")
-    .exec(
-      http("request_index")
+  val scn = scenario("TpccSidecarSimulation")
+    .forever() {
+      exec(
+        http("request_index")
         .get("/")
-    )
-    //.pause(5)
+        .requestTimeout(5.minutes)
+      )
+      // .pause(0.1)
+    }
 
   setUp(
     scn.inject(
-        constantConcurrentUsers(maxClients) during(3600*8 seconds)
+        constantConcurrentUsers(maxClients) during(8.hours)
     )
   ).protocols(httpProtocol)
+  // .maxDuration(8.hours)
 }

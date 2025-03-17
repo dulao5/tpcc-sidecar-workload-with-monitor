@@ -7,9 +7,12 @@ $dbPort = getenv("DB_PORT") ?: "4000";
 $dbUser = getenv("DB_USER") ?: "root";
 $dbPass = getenv("DB_PASS") ?: "";
 $dbName = getenv("DB_NAME") ?: "test";
+$dbType = getenv("DB_TYPE") ?: "tidb";
 
 $beginTime = microtime(true);
 $doneTasks = ["start_process ".date("Y-m-d H:i:s")];
+
+$tidbServerID = 'null';
 
 function traceTasks($taskname) {
 	global $beginTime;
@@ -19,10 +22,45 @@ function traceTasks($taskname) {
 function getDebugInfo($e = null) {
 	global $doneTasks;
 	$res = "doneTasks:\t". join("\t", $doneTasks);
-	if (!is_null($e)) {
+	if (!empty($e)) {
 		$res .= "\t error:\t".str_replace("\n", "\t", $e->getTraceAsString());
 	}
 	return $res;
+}
+
+function getRemoteTiDBServerID($db) {
+	$stmt = $db->query('show status');
+	if (empty($stmt)) {
+		return 'get_empty';
+	}
+	$datas = $stmt->fetchAll();
+	foreach ($datas as $row) {
+		if ($row['Variable_name'] == 'server_id') {
+			return $row['Value'];
+		}
+	}
+	return 'notfound_serverid_key';
+}
+function getRemoteMySQLServerID($db) {
+	$stmt = $db->query('show variables like "hostname"');
+	if (empty($stmt)) {
+		return 'get_empty';
+	}
+	$datas = $stmt->fetchAll();
+	foreach ($datas as $row) {
+		if ($row['Variable_name'] == 'hostname') {
+			return $row['Value'];
+		}
+	}
+	return 'notfound_serverid_key';
+}
+function getRemoteServerID($db) {
+	global $dbType;
+	if ($dbType == "tidb") {
+		return getRemoteTiDBServerID($db);
+	} else {
+		return getRemoteMySQLServerID($db);
+	}
 }
 
 try {
@@ -33,6 +71,9 @@ try {
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
     ));
     traceTasks("do_connect");
+
+    $serverID = getRemoteServerID($db);
+    traceTasks("getRemoteServerID $serverID");
 
     $maxWarehouseId = 2;
     $maxDistrictId = 10;
@@ -49,7 +90,8 @@ try {
     traceTasks("do_sleep");
 
     // create a query to get all the data from the table
-    $stmt = $db->query("SELECT * FROM customer where c_w_id = $maxWarehouseId and  c_d_id = $randomDistrictId and c_id = $randomCustomerId");
+    #$stmt = $db->query("SELECT * FROM customer where c_w_id = $maxWarehouseId and  c_d_id = $randomDistrictId and c_id = $randomCustomerId");
+    $stmt = $db->query("SELECT sleep(0.05)");
     $datas = $stmt->fetchAll(PDO::FETCH_ASSOC);
     traceTasks("do_query");
 
@@ -69,10 +111,12 @@ try {
 
     // close the connection
     $db = null;
+    $errorMsg = "access-tidb-success: -- debug info : ". (getDebugInfo(0));
+    error_log($errorMsg);
 } catch (PDOException $e) {
     traceTasks("error");
     header("HTTP/1.1 501 Internal Server Error");
-    $errorMsg = "phpapp error: ". $e->getMessage(). " -- debug info : ". (getDebugInfo($e));
+    $errorMsg = "access-tidb-error: ". $e->getMessage(). " -- debug info : ". (getDebugInfo($e));
     error_log($errorMsg);
     echo $errorMsg;
 }
