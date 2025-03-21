@@ -21,7 +21,7 @@ function traceTasks($taskname) {
 }
 function getDebugInfo($e = null) {
 	global $doneTasks;
-	$res = "doneTasks:\t". join("\t", $doneTasks);
+	$res = "req_id:".$_SERVER['X_REQUEST_ID']." doneTasks:\t". join("\t", $doneTasks);
 	if (!empty($e)) {
 		$res .= "\t error:\t".str_replace("\n", "\t", $e->getTraceAsString());
 	}
@@ -91,7 +91,7 @@ try {
 
     // create a query to get all the data from the table
     #$stmt = $db->query("SELECT * FROM customer where c_w_id = $maxWarehouseId and  c_d_id = $randomDistrictId and c_id = $randomCustomerId");
-    $stmt = $db->query("SELECT sleep(0.05)");
+    $stmt = $db->query("SELECT sleep(0.05) as req_". $_SERVER['X_REQUEST_ID']);
     $datas = $stmt->fetchAll(PDO::FETCH_ASSOC);
     traceTasks("do_query");
 
