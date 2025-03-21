@@ -36,7 +36,7 @@ DefaultLimitNOFILE=1048576
 systemctl restart systemd-logind
 
 ```
-optional : DNS cache for systemd-resolved
+~~optional : DNS cache for systemd-resolved~~
 ```
 # DNS cache for systemd-resolved
 
@@ -98,7 +98,7 @@ index d76fe77..279d734 100644
 - Run workload
 ```
 docker-compose up -d --build
-docker-compose exec -it gatling gatling
+docker-compose exec -it gatling gatling -rd test
 ```
 
 
