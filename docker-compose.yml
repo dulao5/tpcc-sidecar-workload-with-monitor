@@ -97,6 +97,29 @@ services:
           - nginx
         ipv4_address: 10.20.10.99
 
+  proxysql:
+    build: ./docker/proxysql
+    volumes:
+      - proxysql-sock:/var/lib/proxysql
+      - ./docker/proxysql/proxysql.cnf.template:/etc/proxysql.cnf.template
+    ports:
+      - "6033:6033" # mysql protocol
+      - "6032:6032" # admin
+    environment:
+      - BACKEND_TIDB_HOST=tidb
+      - BACKEND_TIDB_PORT=4000
+      - BACKEND_TIDB_USER=root
+      - BACKEND_TIDB_PASS=tidb1234
+    networks:
+      nginx_network:
+        aliases:
+          - proxysql
+        ipv4_address: 10.20.10.88
+    links:
+      - tidb
+    depends_on:
+      - tidb
+
 volumes:
   gatlingdata:
 #    external: true
