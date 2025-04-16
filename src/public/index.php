@@ -8,6 +8,7 @@ $dbUser = getenv("DB_USER") ?: "root";
 $dbPass = getenv("DB_PASS") ?: "";
 $dbName = getenv("DB_NAME") ?: "test";
 $dbType = getenv("DB_TYPE") ?: "tidb";
+$dbSock = getenv("DB_SOCK") ?: "";
 
 $beginTime = microtime(true);
 $doneTasks = ["start_process ".date("Y-m-d H:i:s")];
@@ -66,7 +67,12 @@ function getRemoteServerID($db) {
 try {
 
     // connect to mysql database (port 4000) using PDO
-    $db = new PDO("mysql:host=$dbHost;dbname=$dbName;port=$dbPort", $dbUser, $dbPass, array(
+    $mysqlDSN = empty($dbSock) ? 
+		"mysql:host=$dbHost;dbname=$dbName;port=$dbPort"
+		:
+		"mysql:unix_socket=$dbSock;dbname=$dbName"
+		;
+    $db = new PDO($mysqlDSN, $dbUser, $dbPass, array(
         PDO::ATTR_TIMEOUT => 5,
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
     ));
@@ -86,7 +92,8 @@ try {
     traceTasks("do_begin");
 
     // sleep 500ms to simulate a slow connection
-    usleep(60000);
+    usleep(60000); // for 2k RPS
+    // usleep(600); // for 2k connection count
     traceTasks("do_sleep");
 
     // create a query to get all the data from the table
@@ -112,7 +119,7 @@ try {
     // close the connection
     $db = null;
     $errorMsg = "access-tidb-success: -- debug info : ". (getDebugInfo(0));
-    error_log($errorMsg);
+    #error_log($errorMsg);
 } catch (PDOException $e) {
     traceTasks("error");
     header("HTTP/1.1 501 Internal Server Error");

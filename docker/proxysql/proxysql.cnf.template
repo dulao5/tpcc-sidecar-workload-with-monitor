@@ -32,7 +32,7 @@ mysql_variables=
     ping_timeout_server=200
     commands_stats=true
     sessions_sort=true
-    max_stmts_per_connection=20
+    max_stmts_per_connection=200
     connection_max_age_ms=300000
     connection_delay_multiplex_ms=0
 }
@@ -44,7 +44,7 @@ mysql_servers =
         port = ${BACKEND_TIDB_PORT}
         hostgroup = 1
         use_ssl = 0
-        max_connections = 100
+        max_connections = 350
     }
 )
 

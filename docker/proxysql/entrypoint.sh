@@ -1,5 +1,6 @@
 #!/bin/sh
 env
+rm -rf /var/lib/proxysql/proxysql.db
 envsubst < /etc/proxysql.cnf.template > /etc/proxysql.cnf
 echo ----------------------------------------------
 cat /etc/proxysql.cnf

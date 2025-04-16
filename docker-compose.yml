@@ -10,6 +10,7 @@ services:
         ipv4_address: 10.20.10.10
     environment:
       - DB_HOST=172.16.19.222 # new internal-nlb peering without neg
+        #- DB_SOCK=/var/lib/proxysql/proxysql.sock # proxysql via sock
       - DB_PORT=4000
       - DB_USER=root
       - DB_PASS=yourpassword
@@ -22,6 +23,7 @@ services:
       - net.ipv4.tcp_fin_timeout=20
     volumes:
     - ./custom-php.ini:/usr/local/etc/php/conf.d/custom-php.ini
+    - proxysql-sock:/var/lib/proxysql
   nginx:
     #platform: linux/amd64
     image: nginx:latest
@@ -122,6 +124,7 @@ services:
 
 volumes:
   gatlingdata:
+  proxysql-sock:
 #    external: true
 
 networks:
