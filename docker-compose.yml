@@ -117,10 +117,6 @@ services:
         aliases:
           - proxysql
         ipv4_address: 10.20.10.88
-    links:
-      - tidb
-    depends_on:
-      - tidb
 
 volumes:
   gatlingdata:
