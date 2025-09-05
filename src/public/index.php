@@ -84,9 +84,12 @@ try {
     $maxWarehouseId = 2;
     $maxDistrictId = 10;
     $maxCustomerId = 3000;
+	$maxOrderLineId = 15;
+	
     $randomWarehouseId = rand(1, $maxWarehouseId);
     $randomDistrictId = rand(1, $maxDistrictId);
     $randomCustomerId = rand(1, $maxCustomerId);
+	$randomOrderLineId = rand(1, $maxOrderLineId);
 
     $stmt = $db->query("begin");
     traceTasks("do_begin");
@@ -96,13 +99,19 @@ try {
     // usleep(600); // for 2k connection count
     traceTasks("do_sleep");
 
-    // create a query to get all the data from the table
+    // trace request id
     $stmt = $db->query("SELECT sleep(0.05) as req_". $_SERVER['X_REQUEST_ID']);
     $datas = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 	// create a query to get all the data from the table
-	$stmt = $db->query("SELECT * FROM customer where c_w_id = $maxWarehouseId and  c_d_id = $randomDistrictId and c_id = $randomCustomerId");
-    traceTasks("do_query");
+	// random str
+	$randomStr = uniqid('test');
+	$stmt = $db->query("SELECT * FROM order_line set ol_dist_info = '$randomStr' where c_w_id = $maxWarehouseId and  c_d_id = $randomDistrictId and c_id = $randomCustomerId");
+	$updated = $stmt->execute(PDO::FETCH_ASSOC);
+    traceTasks("do_update");
+
+	// update
+	$stmt = $db->query("UPDATE customer where c_w_id = $maxWarehouseId and  c_d_id = $randomDistrictId and c_id = $randomCustomerId");
 
     print_r(array(
         "randomIds" => array(
@@ -111,6 +120,7 @@ try {
             "customer" => $randomCustomerId
         ),
 	"data" => $datas,
+	"updated" => $updated,
 	"debug" => getDebugInfo(),
 	"time" => microtime(1) - $beginTime
     ));
