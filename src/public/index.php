@@ -106,12 +106,12 @@ try {
 	// create a query to get all the data from the table
 	// random str
 	$randomStr = uniqid('test');
-	$stmt = $db->query("SELECT * FROM order_line set ol_dist_info = '$randomStr' where c_w_id = $maxWarehouseId and  c_d_id = $randomDistrictId and c_id = $randomCustomerId");
-	$updated = $stmt->execute(PDO::FETCH_ASSOC);
+	$stmt = $db->query("SELECT * FROM customer where c_w_id = $maxWarehouseId and  c_d_id = $randomDistrictId and c_id = $randomCustomerId");
+	$updated = $stmt->execute([]);
     traceTasks("do_update");
 
 	// update
-	$stmt = $db->query("UPDATE customer where c_w_id = $maxWarehouseId and  c_d_id = $randomDistrictId and c_id = $randomCustomerId");
+	$stmt = $db->query("UPDATE order_line set ol_dist_info = '$randomStr' where ol_w_id = $maxWarehouseId and  ol_d_id = $randomDistrictId and ol_o_id = $randomCustomerId and ol_number = $randomOrderLineId" );
 
     print_r(array(
         "randomIds" => array(
