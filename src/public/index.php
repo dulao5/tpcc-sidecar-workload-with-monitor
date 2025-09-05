@@ -97,9 +97,11 @@ try {
     traceTasks("do_sleep");
 
     // create a query to get all the data from the table
-    #$stmt = $db->query("SELECT * FROM customer where c_w_id = $maxWarehouseId and  c_d_id = $randomDistrictId and c_id = $randomCustomerId");
     $stmt = $db->query("SELECT sleep(0.05) as req_". $_SERVER['X_REQUEST_ID']);
     $datas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+	// create a query to get all the data from the table
+	$stmt = $db->query("SELECT * FROM customer where c_w_id = $maxWarehouseId and  c_d_id = $randomDistrictId and c_id = $randomCustomerId");
     traceTasks("do_query");
 
     print_r(array(
